@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:news3_0/data/model/news_model.dart';
 import 'package:news3_0/data/remote/api_client.dart';
 import 'package:news3_0/data/remote/repository.dart';
-import 'package:news3_0/ui/d_d.dart';
 import 'package:news3_0/ui/description_news.dart';
 import 'package:news3_0/ui/home_news.dart';
 import 'package:provider/provider.dart';
@@ -19,9 +18,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       initialRoute: '/',
       routes:<String, WidgetBuilder> {
-        '/one': (BuildContext context) => MyApp(),
+        '/one': (BuildContext context) => HomeNewsScreen(),
         '/one/description': (BuildContext context) => DescriptNews(),
-        '/dd': (BuildContext context) => DD(),
       },
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
@@ -36,7 +34,7 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider<HomeNewsModel>(create: (_)=>HomeNewsModel()),
         ],
         child: HomeNewsScreen(),
-      ) ,
+      ),
     );
   }
 

@@ -4,21 +4,30 @@ import 'package:news3_0/data/remote/api_client.dart';
 import 'package:provider/provider.dart';
 
 class HomeNewsModel extends ChangeNotifier{
-  var indexL;
+  int indexL=1;
   late Future<NewsModel> newsModelList;
+
+  int get getIndex => indexL;
+  Future<NewsModel> get getNewsList => newsModelList;
+
+  void funIn(int index){
+    indexL = index;
+    print('Индекс ${getIndex}');
+    notifyListeners();
+  }
+  void funList(Future<NewsModel> newsModel){
+    newsModelList = newsModel;
+    notifyListeners();
+  }
 }
 
 class HomeNewsScreen extends StatelessWidget {
-  final _wordException = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    //var newsRepositoryProvider = Provider.of<ApiClient>(context,listen: false).newsmModel;
     var newsRepositoryProvider = Provider.of<ApiClient>(context,listen: false);
     var homeProv = Provider.of<HomeNewsModel>(context,listen: false);
     homeProv.newsModelList = newsRepositoryProvider.searchNews('');
-    /*Provider.of<Repository>(context).getNewsRepository('').then(
-            (data) => this.newsModelList2 = data);*/
 
     return Scaffold(
         backgroundColor: Colors.white,
@@ -35,21 +44,7 @@ class HomeNewsScreen extends StatelessWidget {
                         backgroundColor: Color(0xFF393939),
                         title: const Center(child: Text("Фильтр слово", style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Colors.white),)),
                         children: <Widget>[
-                          TextFormField(
-                              controller: _wordException,
-                              decoration: const InputDecoration(
-                                  hintStyle: TextStyle(
-                                  fontSize: 17,
-                                  color: Color(0xFF7D7D7D)),
-                                  filled: true,
-                                  fillColor: Color(0xFF202020),
-                                  hintText: 'ключевое слово'
-                                  ),
-                                onFieldSubmitted: (price) {
-                                  print('price - ${price}');
-                                  homeProv.newsModelList = newsRepositoryProvider.searchNews(price);
-                                },
-                            ),
+                          TextFormFieldWidget(),
                         ])),
                 Expanded(
                   flex: 10,
@@ -59,25 +54,22 @@ class HomeNewsScreen extends StatelessWidget {
                         future: homeProv.newsModelList,
                         builder:(context, snapshot){
                           if (snapshot.hasData) {
-                            print('успех лист ${snapshot.hasData}');
                             return ListView.builder(
                               itemCount: model.newsmModel!.articles!.length,
                               itemBuilder: (context, index) => GestureDetector(
                                 child: CardNew(title: model.newsmModel!.articles[index]!.title,),
                                 onTap: () {
-                                  homeProv.indexL = index;
-                                  Navigator.pushNamed(context, '/one/description');
-                                  /*Navigator.push(context, new MaterialPageRoute(
-                                      builder: (context) => DescriptNews())
-                                  );*/
+                                  homeProv.funIn(index);
+                                  Navigator.pushNamed(context, '/one/description',
+                                    arguments: {
+                                    "index" : homeProv.getIndex,
+                                    "newsList": homeProv.getNewsList});
                                 },
                               ),
                             );
                           } else if (snapshot.hasError) {
-                            print("ошибка ${snapshot.error}");
                             return Text('${snapshot.error}');
                           }
-                          print("другое");
                           return const CircularProgressIndicator();
                         },
                       );
@@ -90,11 +82,32 @@ class HomeNewsScreen extends StatelessWidget {
   }
 }
 
+class TextFormFieldWidget extends StatelessWidget {
+  final _wordException = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    var homeProv = Provider.of<HomeNewsModel>(context,listen: false);
+    var newsRepositoryProvider = Provider.of<ApiClient>(context,listen: false);
+    return TextFormField(
+      controller: _wordException,
+      decoration: const InputDecoration(
+          hintStyle: TextStyle(
+              fontSize: 17,
+              color: Color(0xFF7D7D7D)),
+          filled: true,
+          fillColor: Color(0xFF202020),
+          hintText: 'ключевое слово'
+      ),
+      onFieldSubmitted: (price) {
+        homeProv.newsModelList = newsRepositoryProvider.searchNews(price);
+      },
+    );
+  }
+}
+
 class CardNew extends StatelessWidget {
   final String title;
-  CardNew({
-    required this.title,
-  });
+  CardNew({required this.title,});
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -111,3 +124,5 @@ class CardNew extends StatelessWidget {
     );
   }
 }
+
+
