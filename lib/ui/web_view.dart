@@ -1,30 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:news3_0/data/model/news_model.dart';
+import 'package:news3_0/ui/home_news.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class WebView extends StatelessWidget {
-  final Future<NewsModel> futureAlbum;
-  WebView({
-    required this.futureAlbum,
-  });
 
   @override
   Widget build(BuildContext context) {
-    final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
+    var homeProv = Provider.of<HomeNewsModel>(context,listen: false);
     return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        primary: Color(0xFF393939),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            topRight: Radius.circular(0.0),
-            topLeft: Radius.circular(0.0),
-          ),
-        ),
-      ),
+      style: ElevatedButton.styleFrom(primary: Color(0xFF393939),),
       child: Text('Читать далее', style: TextStyle(fontSize: 24)),
       onPressed: () => {
-        futureAlbum.then((result) =>
-            _launchURL(result.articles![arguments['exampleArgument']].url!)
+        homeProv.newsModelList.then((result) =>
+            _launchURL(result.articles![homeProv.indexL].url!)
         ),
       },
     );

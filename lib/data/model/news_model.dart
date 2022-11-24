@@ -1,4 +1,6 @@
-class NewsModel {
+import 'package:flutter/foundation.dart';
+
+class NewsModel extends ChangeNotifier{
   String? status;
   int? totalResults;
   List<Articles>? articles;
